@@ -1,0 +1,152 @@
+* {
+    box-sizing: border-box;
+}
+
+.container, body, html {
+    height: 100%;
+    margin: 0px;
+}
+
+.container, .container * {
+    display: flex;
+}
+.container, .operators, .number-buttons {
+    justify-content: center;
+    align-items: center;
+}
+
+.calculator, .display, .operators, .number-buttons {
+    flex-direction: column;
+}
+
+.buttons {
+    width: 105%;
+    height: 100%;
+    justify-content: space-evenly;
+    margin-top: 2vh;
+    margin-bottom: -0.25vh;
+}
+
+.calculator {
+    align-items: center;
+    background: #A2BCE0;
+    width: 40vh;
+    height: 65vh;
+    border: #5E5C6C solid 1vh;
+    border-radius: 1vh;
+}
+
+.clear {
+    background-color: red;
+    color: #FEFAE0;
+    border: #9391A1 solid 0.5vh;
+    transition: 0.25s;
+}
+
+.clear:hover {
+    background-color: rgb(192, 0, 0);
+    cursor: pointer;
+}
+
+.delete {
+    background-color: #f5db5a;
+    color: #9391A1;
+    border: #9391A1 solid 0.5vh;
+    transition: 0.25s;
+}
+
+.delete:hover {
+    background-color: #dbc554;
+    cursor: pointer;
+}
+
+.display {
+    margin-top: 5vh;
+    width: 90%;
+    height: 13vh;
+    gap: 2vh;
+    background-color: #5E5C6C;
+    padding: 1vh;
+    border: #9391A1 solid 0.5vh;
+    border-radius: 1vh;
+}
+
+.display * {
+    display: block;
+    text-align: end;
+    height: 5vh;
+    max-height: 5vh;
+    color: #FEFAE0;
+    width: 100%;
+}
+
+.number-buttons {
+    width: 75%;
+    justify-content: space-evenly;
+    border-right: #5E5C6C solid 0.5vh;
+}
+
+.number-buttons div{
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.number-buttons div button:hover {
+    background-color: rgb(100, 100, 100);
+    color: #FEFAE0;
+}
+
+.number-buttons, .operators {
+    border-top: #5E5C6C solid 0.5vh;
+}
+
+.number-buttons div button, .operators * {
+    width: 7vh;
+    height: 7vh;
+    font-size: 2.5vh;
+    justify-content: center;
+    align-items: center;
+    padding: 2vh;
+    border: #9391A1 solid 0.5vh;
+    border-radius: 1vh;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.operation {
+    font-size: 2.5vh;
+    height: 3.5vh;
+}
+
+.operators {
+    justify-content: space-evenly;
+    width: 25%;
+}
+
+.operators * {
+    background-color: #ffbf6c;
+}
+
+.operators *:hover {
+    background-color: #ffa938;
+}
+
+.remove-buttons {
+    margin-top: 3vh;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+.remove-buttons * {
+    width: 15vh;
+    height: 5vh;
+    align-items: center;
+    justify-content: center;
+    font-size: 2vh;
+    border-radius: 1vh;
+}
+
+.result {
+    font-size: 4vh;
+    height: 4.5vh;
+}
