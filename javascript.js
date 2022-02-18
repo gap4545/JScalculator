@@ -13,7 +13,7 @@ let isSecondOperator = false;
 let isNewEquation = true;
 let isDecimalIn = false;
 let hasResult = false;
-let isNumberLast = false;
+let isNumLast = false;
 
 function add(num1, num2) {
     return num1 + num2;
@@ -32,6 +32,7 @@ function divide(num1, num2) {
 };
 
 function round(num) {
+    //Stolen from a DelftStack article... But I changed it to fit my needs
     if (+(Math.round(num + "e+3")  + "e-3") !== Number()) {
         return num;
     } else {
@@ -40,6 +41,7 @@ function round(num) {
 }
 
 function operate(equation) {
+    //Breaks operationDisplay's text into two numbers and the operator, sets vars to initial vals, performs operation, appends result to resultDisplay
     let equationArr = equation.split(' ');
     let num1 = Number(equationArr[0]);
     let operator = equationArr[1];
@@ -50,7 +52,7 @@ function operate(equation) {
     isOperatorIn = false;
     isNewEquation = true;
     isDecimalIn = false;
-    isNumberLast = false;
+    isNumLast = false;
 
     switch(operator) {
         case '+': 
@@ -70,39 +72,8 @@ function operate(equation) {
     scaleText(resultDisplay);
 };
 
-function isOperator(key) {
-    const operations = {'+' : undefined, '-' : undefined, '*' : undefined, '/' : undefined, '×' : undefined, '÷' : undefined};
-
-    if (key in operations) {
-        if (key == '*') {
-            key = '×';
-        } else if (key == '/') {
-            key = '÷';
-        };
-        if (isOperatorIn == false && hasResult == false) {
-            console.log('first op')
-            isDecimalIn = false;
-            isOperatorIn = true;
-            appendDisplay(` ${key} `);
-        } else if (isOperatorIn == false && hasResult == true) {
-            console.log('second op')
-            isDecimalIn = false;
-            isOperatorIn = true;
-            appendDisplay(` ${key} `);
-        } else if (isNumberLast == true && isOperatorIn == true) {
-            console.log('third op')
-            isSecondOperator = true;
-            operate(operationDisplay.textContent);
-            isOperatorIn = true;
-            isNumberLast = false;
-            appendDisplay(` ${key} `);
-            isSecondOperator = false;
-        };
-    };
-};
-
 function measureTextWidth(text, font) {
-
+    //Measures text width. Not originally mine but seems to be a common way to measure text width 
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
@@ -113,6 +84,7 @@ function measureTextWidth(text, font) {
 };
 
 function scaleText(displayElement) {
+    //Scales text down to fit inside display when text overflows display and scales text up upon new equation if text width is smaller then display width
     let eleStyle = window.getComputedStyle(displayElement);
     let fontSize = parseInt(eleStyle.fontSize);
     let textWidth = measureTextWidth(displayElement.textContent, eleStyle.font, fontSize);
@@ -129,26 +101,62 @@ function scaleText(displayElement) {
     };
 };
 
-function appendDisplay(toAppend) {
-    console.log(['check 1', {'isOperatorIn' : isOperatorIn, 'hasResult' : hasResult, 'isNewEquation' : isNewEquation, 'isSecondOperator' : isSecondOperator, 'isNumberLast' : isNumberLast}]);
-    if (isOperatorIn == true && hasResult == true && isNewEquation == true || isSecondOperator == true && hasResult == false) {
-        operationDisplay.textContent = resultDisplay.textContent + toAppend;
-    } else if (isNewEquation == true && isSecondOperator == false) {
-        operationDisplay.textContent = toAppend;
+function checkOperation() {
+    //This is a cheat to check for an operator in operationDisplay
+    if (operationDisplay.textContent.includes(' ')) {
+        isOperatorIn = true;
     } else {
-        operationDisplay.textContent = operationDisplay.textContent + toAppend;
+        isOperatorIn = false;
     };
-    checkOperation();
-    console.log(['check 2', {'isOperatorIn' : isOperatorIn, 'hasResult' : hasResult, 'isNewEquation' : isNewEquation, 'isSecondOperator' : isSecondOperator, 'isNumberLast' : isNumberLast}]);
+    //Checks for a valid operation
+    isNumLast = isFinite(operationDisplay.textContent[operationDisplay.textContent.length - 1]) && operationDisplay.textContent[operationDisplay.textContent.length - 1] !== ' ';
+    if (isOperatorIn == true && isNumLast == true) {
+        canOperate = true;
+    } else {
+        canOperate = false;
+    };
+};
+
+function appendDisplay(toAppend) {
+    //Checks to see how operationDisplay's text should change
+    if (isNewEquation == true && isFinite(toAppend)) {
+        operationDisplay.textContent = toAppend;
+    } else if (isSecondOperator == true || hasResult == true && !(isFinite(toAppend))) {
+        operationDisplay.textContent = resultDisplay.textContent + toAppend;
+    } else {
+        operationDisplay.textContent += toAppend;
+    };
     scaleText(operationDisplay);
     hasResult = false;
     isNewEquation = false;
+    checkOperation();
+};
+
+function isOperator(key) {
+    const operations = {'+' : undefined, '-' : undefined, '*' : undefined, '/' : undefined, '×' : undefined, '÷' : undefined};
+
+    if (key in operations) {
+        if (key == '*') {
+            key = '×';
+        } else if (key == '/') {
+            key = '÷';
+        };
+        if (isOperatorIn == false) {
+            appendDisplay(` ${key} `);
+        } else if (canOperate == true) {
+            isSecondOperator = true;
+            operate(operationDisplay.textContent);
+            appendDisplay(` ${key} `);
+            isSecondOperator = false;
+        };
+    };
 };
 
 function deleteLast() {
     let operationDisplayString = operationDisplay.textContent
     let lastChar = operationDisplayString[operationDisplayString.length - 1];
     if (lastChar == '.') {
+        operationDisplay.textContent = operationDisplayString.substring(0, operationDisplayString.length - 1);
         isDecimalIn = false;
     } else if (lastChar == ' ') {
         operationDisplay.textContent = operationDisplayString.substring(0, operationDisplayString.length - 3);
@@ -160,31 +168,11 @@ function deleteLast() {
     checkOperation();
 };
 
-function checkOperation() {
-    const operations = {'+' : undefined, '-' : undefined, '*' : undefined, '/' : undefined, '×' : undefined, '÷' : undefined};
-    let splitOperation = operationDisplay.textContent.replace(/ /g, '').split('');
-    console.log(splitOperation);
-    if (isOperatorIn == false) {
-        if (splitOperation.slice(1).some(char => char in operations)) {
-            isOperatorIn = true;
-        };
-    } else if (isOperatorIn == true) {
-        if (!(splitOperation.slice(1).some(char => char in operations))) {
-            isOperatorIn = false;
-        };
-    };
-    if (isFinite(splitOperation[splitOperation.length-1]) && splitOperation[splitOperation.length-1] !== '') {
-        isNumberLast = true;
-    } else {
-        isNumberLast = false;
-    };
-};
-
 window.addEventListener('keyup', keyed => {
     let keyPressed = keyed.key
     if (isFinite(keyPressed)) {
         appendDisplay(keyPressed);
-    } else if (keyPressed == '=' && isNumberLast == true || keyPressed == 'Enter' && isNumberLast == true) {
+    } else if (keyPressed == '=' && canOperate == true || keyPressed == 'Enter' && canOperate == true) {
         operate(operationDisplay.textContent);
     } else if (keyPressed == '.' && isDecimalIn == false) {
         appendDisplay(keyPressed);
@@ -209,13 +197,13 @@ operatorButtons.forEach(button => {
 });
 
 equalsButton.addEventListener('click', function() {
-    if (isNumberLast == true && isOperatorIn == true){
+    if (canOperate == true){
         operate(operationDisplay.textContent);
     };
 });
 
 decimalButton.addEventListener('click', function() {
-    if (isNumberLast == true && isDecimalIn == false) {
+    if (isDecimalIn == false && isNumLast == true) {
         isDecimalIn = true;
         appendDisplay('.');
     } else if (isDecimalIn == false) {
